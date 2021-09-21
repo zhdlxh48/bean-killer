@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>websock test</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script>
+      var defaultUrl = 'http://' + document.domain + ':' + location.port;
+      var socketConn = null;
+
+      var roomListDom = document.getElementById('roomList');
+
+      var roomRefresh = () => {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === xhr.DONE) {
+            if (xhr.status === 200 || xhr.status === 201) {
+              
+              if (roomListDom === null)
+                roomListDom = document.getElementById('roomList');
+
+              while (roomListDom.hasChildNodes())
+                roomListDom.removeChild(roomListDom.firstChild);
+
+              var result = JSON.parse(xhr.responseText);
+              Object.keys(result.data).forEach((key) => {
+                var value = result[key];
+
+                var newNodeLabel = document.createElement('label');
+                var newNode = document.createElement('input');
+                newNode.id = 'roomItem';
+                newNode.name = 'roomItem';
+                newNode.type = 'radio';
+                newNode.value = key;
+                
+                var newNodeText = document.createElement('div');
+                newNodeText.innerText = key;
+
+                newNodeLabel.appendChild(newNode);
+                newNodeLabel.appendChild(newNodeText);
+                
+                roomListDom.appendChild(newNodeLabel);
+                roomListDom.appendChild(
+                  document.createElement('br')
+                );
+              });
+            }
+          }
+        };
+        xhr.open('GET', defaultUrl);
+        xhr.send();
+      };
+
+      var roomCreate = () => {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === xhr.DONE) {
+            if (xhr.status === 200 || xhr.status === 201) {
+              establishSocket();
+            }
+          }
+        };
+        xhr.open('PUT', defaultUrl);
+        xhr.send();
+      };
+
+      var roomSelect = () => {
+        var radios = document.getElementsByName('roomItem');
+
+        for (var i = 0, length = radios.length; i < length; i++) {
+          if (radios[i].checked) {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState === xhr.DONE) {
+                if (xhr.status === 200 || xhr.status === 201) {
+                  establishSocket();
+                }
+                else {
+                  console.log(xhr.status);
+                  console.log(JSON.parse(xhr.responseText));
+                }
+              }
+            };
+            xhr.open('POST', defaultUrl, true);
+            xhr.send(JSON.stringify({
+              room: radios[i].value,
+            }));
+
+            break;
+          }
+        }
+      };
+
+      var establishSocket = () => {
+        socketConn = io.connect(defaultUrl + '/play');
+        socketConn.on('response', (msg) => {
+          new_node = document.createElement('p')
+          new_node.innerText = msg.user + ': ' + msg.data;
+          document.getElementById('dataReceived').appendChild(new_node);
+        });
+        socketConn.on('playerenter', (msg) => {
+          new_node = document.createElement('p')
+          new_node.innerText = msg.user + ' entered! COLOR = [\'' + msg.data.color + '\']';
+          document.getElementById('dataReceived').appendChild(new_node);
+        });
+        socketConn.on('playerleave', (msg) => {
+          new_node = document.createElement('p')
+          new_node.innerText = msg.user + ' leaved!';
+          document.getElementById('dataReceived').appendChild(new_node);
+        });
+        socketConn.on('playergetscore', (msg) => {
+          new_node = document.createElement('p')
+          new_node.innerText = msg.user + ' updated score as ' + msg.data.score;
+          document.getElementById('dataReceived').appendChild(new_node);
+        });
+        socketConn.on('playerstartagreed', (msg) => {
+          new_node = document.createElement('p')
+          new_node.innerText = msg.user + ' ready to fight!';
+          document.getElementById('dataReceived').appendChild(new_node);
+        });
+        socketConn.on('playergameover', (msg) => {
+          new_node = document.createElement('p')
+          new_node.innerText = msg.user + ' game over!';
+          document.getElementById('dataReceived').appendChild(new_node);
+        });
+        socketConn.on('roomgameover', (msg) => {
+          new_node = document.createElement('p')
+          new_node.innerText = 'All players\' game in this room is over!';
+          document.getElementById('dataReceived').appendChild(new_node);
+        });
+      };
+
+      var sendMessage = () => {
+        if (socketConn === null) return false;
+        
+        var input_element = document.getElementById('inputData');
+        var input_type = document.getElementById('inputType');
+        var input_val = input_element.value;
+
+        if(input_val == '') return false;
+
+        socketConn.emit(input_type.value, {
+          data: input_val
+        });
+        
+        input_element.value = "";
+      };
+
+      var sendScore = () => {
+        if (socketConn === null) return false;
+        
+        var input_element = document.getElementById('inputScore');
+        var input_val = input_element.value;
+
+        if(input_val == '') return false;
+
+        socketConn.emit('playergetscore', {
+          data: {
+            score: input_val
+          }
+        });
+        
+        input_element.value = "";
+      };
+
+      var sendPlayReady = () => {
+        if (socketConn === null) return false;
+        socketConn.emit('playerstartagree', { data: '' });
+      };
+      var sendGameOver = () => {
+        if (socketConn === null) return false;
+        socketConn.emit('playergameover', { data: '' });
+      };
+
+
+
+
+
+      
+      var roomCreateOnly = () => {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === xhr.DONE) {
+            if (xhr.status === 200 || xhr.status === 201) {
+            }
+          }
+        };
+        xhr.open('PUT', defaultUrl);
+        xhr.send();
+      };
+      var roomSelectOnly = () => {
+        var radios = document.getElementsByName('roomItem');
+
+        for (var i = 0, length = radios.length; i < length; i++) {
+          if (radios[i].checked) {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState === xhr.DONE) {
+                if (xhr.status === 200 || xhr.status === 201) {
+                }
+                else {
+                  console.log(xhr.status);
+                  console.log(JSON.parse(xhr.responseText));
+                }
+              }
+            };
+            xhr.open('POST', defaultUrl, true);
+            xhr.send(JSON.stringify({
+              room: radios[i].value,
+            }));
+
+            break;
+          }
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <div>
+      <h1>ROOM LIST</h1>
+      <div id="roomList"></div>
+    </div>
+    <button onclick="roomRefresh(); return false;">
+      Refresh room list
+    </button>
+    <button onclick="roomSelect(); return false;">
+      Enter selected room
+    </button>
+    <button onclick="roomCreate(); return false;">
+      Create room and enter
+    </button>
+
+    <br /><br />
+    <input id="inputType" type="text" />
+    <input id="inputData" type="text" />
+    <button onclick="sendMessage(); return false;">
+      SEND
+    </button>
+    <br /><br />
+
+    <button onclick="sendPlayReady(); return false;">
+      준비 만전!
+    </button>
+    <button onclick="sendGameOver(); return false;">
+      게임 오버!
+    </button><br />
+    Score : <input id="inputScore" type="text" />
+    <button onclick="sendScore(); return false;">
+      SEND
+    </button>
+
+    <div id="dataReceived">
+      <h1>RECEIVED</h1>
+    </div>
+  </body>
+</html>

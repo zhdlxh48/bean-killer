@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="AudioFile" id="{11525774-f13c-400c-a080-390be6b5973d}">
+		<property name="assetPath">
+			<value>y2mate.com - [브금대통령](4hands피아노장난꾸러기) 꾸러기 표정Prank Boy [무료음악브금Royalty Free Music]_4oLUBmAUvY8_192kbps.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>74.031020408163272</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{3cb70e9b-5b9e-4a26-a3aa-3169f23af8d5}</destination>
+		</relationship>
+	</object>
+</objects>

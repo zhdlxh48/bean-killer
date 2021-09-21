@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.00.00">
+	<object class="AudioFile" id="{2760262d-3a6a-4709-bf99-f48a639f0bd0}">
+		<property name="assetPath">
+			<value>ingame_normal_malicious.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>222.92897959183674</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{3cb70e9b-5b9e-4a26-a3aa-3169f23af8d5}</destination>
+		</relationship>
+	</object>
+</objects>
